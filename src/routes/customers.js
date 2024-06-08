@@ -11,6 +11,7 @@ import {
 } from "../controllers/customersController.js";
 import { preventGuest } from "../middleware/preventGuest.js";
 import { validateAdmin } from "../middleware/adminValidation.js";
+import { preventAdmin } from "../middleware/preventAdmin.js";
 
 const router = Router();
 
@@ -26,9 +27,21 @@ router.get("/", validateAdmin, bodyContentBlocker, getAllCustomersController);
 router.get("/profile", bodyContentBlocker, getCustomerByIdController);
 
 // PUT route for updating customer info
-router.put("/", preventGuest, validateCustomer, updateCustomerController);
+router.put(
+  "/",
+  preventGuest,
+  preventAdmin,
+  validateCustomer,
+  updateCustomerController
+);
 
 // DELETE route for deleting customer
-router.delete("/", preventGuest, bodyContentBlocker, deleteCustomerController);
+router.delete(
+  "/",
+  preventGuest,
+  preventAdmin,
+  bodyContentBlocker,
+  deleteCustomerController
+);
 
 export default router;
