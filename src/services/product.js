@@ -1,4 +1,5 @@
 import nedb from "nedb-promises";
+import { getFormattedDateTime } from "../utils/date.js";
 
 const database = new nedb({ filename: "product.db", autoload: true });
 
@@ -7,37 +8,45 @@ const defaultProducts = [
     title: "Bryggkaffe",
     desc: "Bryggd på månadens bönor.",
     price: 39,
+    createdAt: getFormattedDateTime(),
   },
   {
     title: "Caffè Doppio",
     desc: "Bryggd på månadens bönor.",
     price: 49,
+    createdAt: getFormattedDateTime(),
   },
   {
     title: "Cappuccino",
     desc: "Bryggd på månadens bönor.",
     price: 49,
+    createdAt: getFormattedDateTime(),
   },
   {
     title: "Latte Macchiato",
     desc: "Bryggd på månadens bönor.",
     price: 49,
+    createdAt: getFormattedDateTime(),
   },
   {
     title: "Kaffe Latte",
     desc: "Bryggd på månadens bönor.",
     price: 54,
+    createdAt: getFormattedDateTime(),
   },
   {
     title: "Cortado",
     desc: "Bryggd på månadens bönor.",
     price: 39,
+    createdAt: getFormattedDateTime(),
   },
 ];
 
 // Add new menu item
 async function createProduct(product) {
   try {
+    product.createdAt = getFormattedDateTime();
+
     const newProduct = await database.insert(product);
     console.log(newProduct);
   } catch (error) {
@@ -67,6 +76,8 @@ async function getProductById(id) {
 // Update menu item
 async function updateProduct(id, updatedProduct) {
   try {
+    updatedProduct.modifiedAt = getFormattedDateTime();
+
     const product = await database.findOne({ _id: id });
 
     if (!product) {
