@@ -1,5 +1,6 @@
 import { findCustomerByEmail, getAllCustomers } from "./customers.js";
 import { updateCustomerLoggedInStatus } from "../utils/updateLoggedInStatus.js";
+import { findLoggedInCustomer } from "../utils/findLoggedCustomer.js";
 
 // Function to handle user login
 export async function loginCustomer(email, password) {
@@ -7,14 +8,19 @@ export async function loginCustomer(email, password) {
   const customer = await findCustomerByEmail(email);
 
   if (!customer) {
-    throw new Error("Invalid email");
+    return { success: false, message: "Invalid email" };
   }
 
   // Check if the password matches
   if (customer.password === password) {
-    // Check if another customer is logged in
-    const customers = await getAllCustomers();
-    const loggedInCustomer = customers.find((customer) => customer.loggedIn);
+    const loggedInCustomer = await findLoggedInCustomer();
+
+    if (loggedInCustomer && loggedInCustomer.email === customer.email) {
+      return {
+        success: false,
+        message: `${loggedInCustomer.email} is already logged in.`,
+      };
+    }
 
     // If another customer is logged in, set their loggedIn status to false
     if (loggedInCustomer) {
@@ -25,8 +31,12 @@ export async function loginCustomer(email, password) {
       customer._id,
       true
     );
-    return { message: "Login successful", customer: updatedCustomer };
+    return {
+      success: true,
+      message: "Login successful",
+      customer: updatedCustomer,
+    };
   } else {
-    throw new Error("Invalid password");
+    return { success: false, message: "Invalid password" };
   }
 }
