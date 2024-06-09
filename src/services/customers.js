@@ -1,7 +1,12 @@
 import nedb from "nedb-promises";
 import { updateCustomerLoggedInStatus } from "../utils/updateLoggedInStatus.js";
+import {
+  handleErrorResponse,
+  handleSuccessResponse,
+} from "../utils/responseHandler.js";
+import { findLoggedInCustomer } from "../utils/findLoggedCustomer.js";
 
-const database = new nedb({ filename: "customers.db", autoload: true });
+export const database = new nedb({ filename: "customers.db", autoload: true });
 
 const defaultAdmin = {
   firstName: "admin",
@@ -20,10 +25,8 @@ const defaultGuest = {
 // Initialize database with default guest
 export async function initializeCustomerDatabase() {
   try {
-    // Check if there are any existing customers
     const existingCustomers = await database.find({});
     if (existingCustomers.length === 0) {
-      // If no existing customers, insert default guest
       await database.insert(defaultGuest);
       await database.insert(defaultAdmin);
     }
@@ -34,78 +37,112 @@ export async function initializeCustomerDatabase() {
 }
 
 // Function to create a new customer
-async function createCustomer(customerData) {
+export async function createCustomer(req, res) {
   try {
-    // Adding the loggedIn property to customerData
+    const customerData = req.body;
     const customerDataWithLoggedIn = { ...customerData, loggedIn: false };
-
     const newCustomer = await database.insert(customerDataWithLoggedIn);
     const message = `Customer Created. Welcome ${newCustomer.firstName}`;
-    return { message, newCustomer };
+
+    return handleSuccessResponse(res, { customer: newCustomer }, message, 201);
   } catch (error) {
-    throw new Error("Failed to create customer");
+    return handleErrorResponse(
+      res,
+      "Failed to create customer",
+      500,
+      error.message
+    );
   }
 }
 
 // Function to get all customers
-async function getAllCustomers() {
+export async function getAllCustomers(req, res) {
   try {
     const customers = await database.find({});
     if (customers.length === 0) {
-      throw new Error("No customers found");
+      return handleErrorResponse(res, "No customers found", 404);
     }
-    return customers;
-  } catch (error) {
-    throw Error(error.message);
-  }
-}
 
-// Function to get a customer by ID
-async function getCustomerById(id) {
-  try {
-    const customer = await database.findOne({ _id: id });
-    if (!customer) {
-      throw new Error("Customer not found");
-    }
-    return customer;
+    return handleSuccessResponse(
+      res,
+      { customers },
+      "Customers retrieved successfully"
+    );
   } catch (error) {
-    throw new Error("Failed to fetch customer.");
+    return handleErrorResponse(
+      res,
+      "Failed to fetch customers",
+      500,
+      error.message
+    );
   }
 }
 
 // Function to update a customer
-async function updateCustomer(id, updatedCustomerData) {
+export async function updateCustomer(req, res) {
   try {
-    const customer = await database.findOne({ _id: id });
+    const loggedInCustomer = await findLoggedInCustomer();
+    const customerId = loggedInCustomer._id;
+    const updatedCustomerData = req.body;
+    const customer = await database.findOne({ _id: customerId });
+
     if (!customer) {
-      throw new Error("Customer not found");
+      return handleErrorResponse(res, "Customer not found", 404);
     }
-    await database.update({ _id: id }, { $set: updatedCustomerData });
-    return "Customer updated successfully";
+
+    await database.update({ _id: customerId }, { $set: updatedCustomerData });
+    return handleSuccessResponse(res, {}, "Customer updated successfully");
   } catch (error) {
-    throw Error(error.message);
+    return handleErrorResponse(
+      res,
+      "Failed to update customer",
+      500,
+      error.message
+    );
   }
 }
 
 // Function to delete a customer
-async function deleteCustomer(id) {
+export async function deleteCustomer(req, res) {
   try {
-    const numRemoved = await database.remove({ _id: id });
-    if (numRemoved === 0) {
-      throw new Error("Customer not found");
-    }
+    const loggedInCustomer = await findLoggedInCustomer();
+    const customerId = loggedInCustomer._id;
 
-    // Automatically log in the guest user
+    await database.remove({ _id: customerId });
     await updateCustomerLoggedInStatus("guestintest", true);
 
-    return "Customer deleted successfully";
+    return handleSuccessResponse(
+      res,
+      {},
+      `Customer deleted successfully. Bye ${loggedInCustomer.firstName}`
+    );
   } catch (error) {
-    throw Error(error.message);
+    return handleErrorResponse(
+      res,
+      "Failed to delete customer",
+      500,
+      error.message
+    );
+  }
+}
+
+//Customer profile
+export async function findCustomerProfile(req, res) {
+  try {
+    const customer = await findLoggedInCustomer();
+    return handleSuccessResponse(res, { customer }, "Profile found");
+  } catch (error) {
+    return handleErrorResponse(
+      res,
+      "Failed to find customer profile",
+      500,
+      error.message
+    );
   }
 }
 
 // Function to find a customer by email
-async function findCustomerByEmail(email) {
+export async function findCustomerByEmail(email) {
   try {
     const customer = await database.findOne({ email });
     return customer;
@@ -115,7 +152,7 @@ async function findCustomerByEmail(email) {
 }
 
 // Function to find a customer by phone number
-async function findCustomerByPhoneNumber(phoneNumber) {
+export async function findCustomerByPhoneNumber(phoneNumber) {
   try {
     const customer = await database.findOne({ phoneNumber });
     return customer;
@@ -123,14 +160,3 @@ async function findCustomerByPhoneNumber(phoneNumber) {
     throw new Error("Failed to find customer by phone number");
   }
 }
-
-export {
-  createCustomer,
-  getAllCustomers,
-  getCustomerById,
-  updateCustomer,
-  deleteCustomer,
-  findCustomerByEmail,
-  findCustomerByPhoneNumber,
-  database,
-};

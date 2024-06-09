@@ -2,6 +2,10 @@ import { Router } from "express";
 import { getProductById } from "../services/product.js";
 import { bodyContentBlocker } from "../middleware/bodyContentBlocker.js";
 import { findLoggedInCustomer } from "../utils/findLoggedCustomer.js";
+import {
+  handleSuccessResponse,
+  handleErrorResponse,
+} from "../utils/responseHandler.js";
 
 const router = Router({ mergeParams: true });
 const carts = {}; // Object to store carts for each customer
@@ -40,13 +44,9 @@ router.get("/", bodyContentBlocker, async (req, res, next) => {
   const totalPrice = calculateTotalPrice(cart);
   console.log(totalPrice);
 
-  res.status(200).json({
-    success: true,
-    status: 200,
-    data: {
-      cart,
-      totalPrice,
-    },
+  return await handleSuccessResponse(res, {
+    cart,
+    totalPrice,
   });
 });
 
@@ -59,11 +59,11 @@ router.post("/:productId", bodyContentBlocker, async (req, res, next) => {
     const foundItem = await getProductById(productId);
 
     if (!foundItem) {
-      return res.status(404).json({
-        success: false,
-        status: 404,
-        message: "Produkten du försöker lägga till existerar inte.",
-      });
+      return handleErrorResponse(
+        res,
+        "Produkten du försöker lägga till existerar inte.",
+        404
+      );
     }
 
     const cart = getCart(customerId);
@@ -71,9 +71,7 @@ router.post("/:productId", bodyContentBlocker, async (req, res, next) => {
 
     const totalPrice = calculateTotalPrice(cart);
 
-    res.status(200).json({
-      success: true,
-      status: 200,
+    return handleSuccessResponse(res, {
       message: "Produkt tillagd i varukorgen",
       data: {
         cart,

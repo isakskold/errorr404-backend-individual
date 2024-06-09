@@ -1,18 +1,13 @@
-import { getCustomerById } from "./customers.js";
+import { findLoggedInCustomer } from "../utils/findLoggedCustomer.js";
 import { updateCustomerLoggedInStatus } from "../utils/updateLoggedInStatus.js";
 
 // Function to handle user logout
-export async function logoutCustomer(customerId) {
+export async function logoutCustomer() {
   // Find the customer by ID
-  const customer = await getCustomerById(customerId);
-
+  const customer = await findLoggedInCustomer();
+  console.log(customer);
   if (!customer) {
     throw new Error("Customer not found");
-  }
-
-  // Check if the customer is logged in
-  if (!customer.loggedIn) {
-    throw new Error("Customer is already logged out");
   }
 
   // Check if the customer is the guest

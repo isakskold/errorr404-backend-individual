@@ -19,8 +19,6 @@ import {
   logOrdersParam,
 } from "./src/middleware/routeConsoleLogs.js";
 
-import protectedRoute from "./src/middleware/protectedRoutes.js";
-
 const app = express();
 
 //Middlewares
