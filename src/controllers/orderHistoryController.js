@@ -3,8 +3,9 @@ import {
   getOrderHistoryById,
 } from "../services/orderHistory.js";
 import { findLoggedInCustomer } from "../utils/findLoggedCustomer.js";
+import { asyncErrorHandler } from "../utils/asyncErrorHandler.js";
 
-export const getOrderHistory = async (req, res) => {
+export const getOrderHistory = asyncErrorHandler(async (req, res) => {
   const loggedInCustomer = await findLoggedInCustomer();
   const id = loggedInCustomer._id;
   try {
@@ -13,13 +14,15 @@ export const getOrderHistory = async (req, res) => {
   } catch (error) {
     return res.status(404).json({ message: "Order History not found" });
   }
-};
+});
 
-export const getAllOrderHistoriesHandler = async (req, res) => {
-  try {
-    const orderHistories = await getAllOrderHistories();
-    return res.status(200).json(orderHistories);
-  } catch (error) {
-    return res.status(404).json({ message: "No order histories found" });
+export const getAllOrderHistoriesHandler = asyncErrorHandler(
+  async (req, res) => {
+    try {
+      const orderHistories = await getAllOrderHistories();
+      return res.status(200).json(orderHistories);
+    } catch (error) {
+      return res.status(404).json({ message: "No order histories found" });
+    }
   }
-};
+);

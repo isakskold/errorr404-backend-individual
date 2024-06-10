@@ -10,25 +10,25 @@ import {
 import { bodyContentBlocker } from "../middleware/bodyContentBlocker.js";
 import { validateAdmin } from "../middleware/adminValidation.js";
 
-const router = Router();
+const productRouter = Router();
 
 // URL for CRUD operations: localhost:3000/api/products
 
 // GET all menu items
-router.get("/", bodyContentBlocker, async (req, res) => {
+productRouter.get("/", bodyContentBlocker, async (req, res) => {
   const products = await getAllProducts();
   res.json(products);
 });
 
 // POST new menu item
-router.post("/", validateAdmin, validateProduct, async (req, res) => {
+productRouter.post("/", validateAdmin, validateProduct, async (req, res) => {
   const newProduct = req.body;
   await createProduct(newProduct);
   res.status(201).json(newProduct);
 });
 
 // GET specific menu item by _id
-router.get("/:id", bodyContentBlocker, async (req, res) => {
+productRouter.get("/:id", bodyContentBlocker, async (req, res) => {
   const id = req.params.id;
   const product = await getProductById(id);
   if (product) {
@@ -39,7 +39,7 @@ router.get("/:id", bodyContentBlocker, async (req, res) => {
 });
 
 // UPDATE menu item by _id
-router.put("/:id", validateAdmin, validateProduct, async (req, res) => {
+productRouter.put("/:id", validateAdmin, validateProduct, async (req, res) => {
   const id = req.params.id;
   const updatedProduct = req.body;
   try {
@@ -55,18 +55,23 @@ router.put("/:id", validateAdmin, validateProduct, async (req, res) => {
 });
 
 // DELETE menu item by _id
-router.delete("/:id", validateAdmin, bodyContentBlocker, async (req, res) => {
-  const id = req.params.id;
-  try {
-    await deleteProduct(id);
-    res.json({ message: "Menu item deleted successfully" });
-  } catch (error) {
-    if (error.status === 404) {
-      res.status(404).json({ message: "Product not found" });
-    } else {
-      res.status(500).json({ message: "Internal server error" });
+productRouter.delete(
+  "/:id",
+  validateAdmin,
+  bodyContentBlocker,
+  async (req, res) => {
+    const id = req.params.id;
+    try {
+      await deleteProduct(id);
+      res.json({ message: "Menu item deleted successfully" });
+    } catch (error) {
+      if (error.status === 404) {
+        res.status(404).json({ message: "Product not found" });
+      } else {
+        res.status(500).json({ message: "Internal server error" });
+      }
     }
   }
-});
+);
 
-export default router;
+export default productRouter;

@@ -1,20 +1,20 @@
-import { logoutCustomer } from "../services/logout.js";
 import { findLoggedInCustomer } from "../utils/findLoggedCustomer.js";
+import { updateCustomerLoggedInStatus } from "../utils/updateLoggedInStatus.js";
+import { asyncErrorHandler } from "../utils/asyncErrorHandler.js";
 
 // Controller function for user logout
-export async function logoutController(req, res) {
-  try {
-    const loggedInCustomer = await findLoggedInCustomer();
-    const customerId = loggedInCustomer._id;
+export const logoutController = asyncErrorHandler(async (req, res) => {
+  // Find the customer by ID
+  const customer = await findLoggedInCustomer();
 
-    // Call the logout service function
-    const response = await logoutCustomer(customerId);
+  // Update the loggedIn status to false
+  await updateCustomerLoggedInStatus(customer._id, false);
 
-    // Return a success response
-    return res.status(200).json(response);
-  } catch (error) {
-    // If a custom status code is set, use it; otherwise, default to 500
-    const statusCode = error.statusCode || 500;
-    return res.status(statusCode).json({ message: error.message });
-  }
-}
+  // Automatically log in the guest user
+  await updateCustomerLoggedInStatus("guestintest", true);
+
+  return res.status(200).json({
+    status: "success",
+    message: `${customer.firstName} logged out`,
+  });
+});

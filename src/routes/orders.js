@@ -1,14 +1,13 @@
 import express from "express";
 import { createOrder, getOrderById } from "../services/orders.js";
-import { getCart } from "../routes/cart.js"; // Import the getCart function
-import { calculateTotalPrice } from "../routes/cart.js";
+import { calculateTotalPrice, getCart } from "../services/cart.js";
 import { bodyContentBlocker } from "../middleware/bodyContentBlocker.js";
 import { findLoggedInCustomer } from "../utils/findLoggedCustomer.js";
 
-const router = express.Router({ mergeParams: true });
+const ordersRouter = express.Router({ mergeParams: true });
 
 //Place order
-router.post("/", bodyContentBlocker, async (req, res) => {
+ordersRouter.post("/", bodyContentBlocker, async (req, res) => {
   const loggedInCustomer = await findLoggedInCustomer();
   const userId = loggedInCustomer._id;
   const cart = getCart(userId); // Fetch the user's specific cart
@@ -22,7 +21,7 @@ router.post("/", bodyContentBlocker, async (req, res) => {
 });
 
 //See specific order
-router.get("/:orderId", bodyContentBlocker, async (req, res) => {
+ordersRouter.get("/:orderId", bodyContentBlocker, async (req, res) => {
   const loggedInCustomer = await findLoggedInCustomer();
   const userId = loggedInCustomer._id;
   const orderId = req.params.orderId;
@@ -30,4 +29,4 @@ router.get("/:orderId", bodyContentBlocker, async (req, res) => {
   res.status(result.status).json(result.response);
 });
 
-export default router;
+export default ordersRouter;

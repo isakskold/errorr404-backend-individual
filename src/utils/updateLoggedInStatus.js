@@ -6,5 +6,8 @@ import { database } from "../services/customers.js";
 //If a customer logs in, log out the customer that is currently logged in.
 
 export async function updateCustomerLoggedInStatus(customerId, status) {
-  await database.update({ _id: customerId }, { $set: { loggedIn: status } });
+  return await database.update(
+    { _id: customerId },
+    { $set: { loggedIn: status } }
+  );
 }

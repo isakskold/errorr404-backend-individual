@@ -1,0 +1,1 @@
+{"userId":"guestintest","firstName":"Guest","totalPrice":54,"orders":[{"orderId":428998,"userId":"guestintest","items":[{"title":"Kaffe Latte","desc":"Bryggd på månadens bönor.","price":54,"createdAt":"2024-06-10 21:41:03","_id":"CXjzh31GwTJEqfLY"}],"totalPrice":54,"orderTime":"2024-06-10 20:23:09","deliveryTime":"2024-06-10 20:43:09"}],"_id":"anl2Y92Umgl0MWcn"}
