@@ -1,6 +1,6 @@
 import { calculateTotalPrice, getCart } from "../services/cart.js";
 import { findLoggedInCustomer } from "../utils/findLoggedCustomer.js";
-import { getProductById } from "../services/product.js";
+import { getProductById } from "../controllers/productsController.js";
 import CustomError from "../utils/customError.js";
 import { asyncErrorHandler } from "../utils/asyncErrorHandler.js";
 
