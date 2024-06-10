@@ -1,25 +1,32 @@
-import {
-  getAllOrderHistories,
-  getOrderHistoryById,
-} from "../services/orderHistory.js";
 import { findLoggedInCustomer } from "../utils/findLoggedCustomer.js";
+import { asyncErrorHandler } from "../utils/asyncErrorHandler.js";
+import { orderHistoryDb } from "../services/orderHistory.js";
+import CustomError from "../utils/customError.js";
 
-export const getOrderHistory = async (req, res) => {
+export const getOrderHistory = asyncErrorHandler(async (req, res, next) => {
   const loggedInCustomer = await findLoggedInCustomer();
   const id = loggedInCustomer._id;
-  try {
-    const orderHistory = await getOrderHistoryById(id);
-    return res.status(200).json(orderHistory);
-  } catch (error) {
-    return res.status(404).json({ message: "Order History not found" });
+  const orderHistory = await orderHistoryDb.findOne({ userId: id });
+  if (!orderHistory) {
+    throw new CustomError("Order history not found", 404);
   }
-};
+  return res.status(200).json({
+    status: "Success",
+    message: "Order history found",
+    data: orderHistory,
+  });
+});
 
-export const getAllOrderHistoriesHandler = async (req, res) => {
-  try {
-    const orderHistories = await getAllOrderHistories();
-    return res.status(200).json(orderHistories);
-  } catch (error) {
-    return res.status(404).json({ message: "No order histories found" });
+export const getAllOrderHistoriesHandler = asyncErrorHandler(
+  async (req, res, next) => {
+    const orderHistories = await orderHistoryDb.find({});
+    if (orderHistories.length === 0) {
+      throw new CustomError("No order histories found", 404);
+    }
+    return res.status(200).json({
+      status: "Success",
+      message: "All order histories found",
+      data: orderHistories,
+    });
   }
-};
+);

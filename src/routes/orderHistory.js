@@ -7,10 +7,10 @@ import {
 import { preventGuest } from "../middleware/preventGuest.js";
 import { validateAdmin } from "../middleware/adminValidation.js";
 
-const router = express.Router();
+const orderHistoryRouter = express.Router();
 
 // GET all order histories
-router.get(
+orderHistoryRouter.get(
   "/all",
   validateAdmin,
   bodyContentBlocker,
@@ -18,6 +18,6 @@ router.get(
 );
 
 // GET order history
-router.get("/", preventGuest, bodyContentBlocker, getOrderHistory);
+orderHistoryRouter.get("/", preventGuest, bodyContentBlocker, getOrderHistory);
 
-export default router;
+export default orderHistoryRouter;

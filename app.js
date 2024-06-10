@@ -3,6 +3,8 @@ import cors from "cors";
 
 import { initializeDatabase } from "./src/services/product.js"; //product database
 import { initializeCustomerDatabase } from "./src/services/customers.js";
+import CustomError from "./src/utils/customError.js";
+import globalErrorHandler from "./src/controllers/errorController.js";
 
 import cartRouter from "./src/routes/cart.js";
 import aboutRouter from "./src/routes/about.js";
@@ -19,15 +21,13 @@ import {
   logOrdersParam,
 } from "./src/middleware/routeConsoleLogs.js";
 
-import protectedRoute from "./src/middleware/protectedRoutes.js";
-
 const app = express();
 
 //Middlewares
 app.use(express.json());
 app.use(cors());
 
-//Routes
+// Routes
 app.use("/customers", customerRouter);
 app.use("/login", loginRouter);
 app.use("/logout", logoutRouter);
@@ -36,6 +36,19 @@ app.use("/products", productRouter);
 app.use("/cart", logCartParam, cartRouter);
 app.use("/orders", logOrdersParam, ordersRouter);
 app.use("/order-history", logOrderHistory, orderHistoryRouter);
+
+//Default error for invalid routes
+app.all("*", (req, res, next) => {
+  const err = new CustomError(
+    `Can't find ${req.originalUrl} on the server`,
+    404
+  );
+
+  next(err);
+});
+
+//Global error handling
+app.use(globalErrorHandler);
 
 // Initialize both databases with default data if empty, then start the server
 const PORT = process.env.PORT || 3000;

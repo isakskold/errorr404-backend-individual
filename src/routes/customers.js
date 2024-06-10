@@ -1,47 +1,49 @@
 // routes/customers.js
 import { Router } from "express";
+
+import {
+  createCustomer,
+  getAllCustomers,
+  updateCustomer,
+  deleteCustomer,
+  findCustomerProfile,
+} from "../controllers/customersController.js";
+
 import { validateCustomer } from "../middleware/customersValidation.js";
 import { bodyContentBlocker } from "../middleware/bodyContentBlocker.js";
-import {
-  createCustomerController,
-  getAllCustomersController,
-  getCustomerByIdController,
-  updateCustomerController,
-  deleteCustomerController,
-} from "../controllers/customersController.js";
 import { preventGuest } from "../middleware/preventGuest.js";
 import { validateAdmin } from "../middleware/adminValidation.js";
 import { preventAdmin } from "../middleware/preventAdmin.js";
 
-const router = Router();
-
-// URL for CRUD operations: localhost:3000/api/customers
+const customerRouter = Router();
 
 // POST route for adding a new customer
-router.post("/", validateCustomer, createCustomerController);
+customerRouter.post("/", validateCustomer, createCustomer);
 
 // GET route for fetching all customers
-router.get("/", validateAdmin, bodyContentBlocker, getAllCustomersController);
+customerRouter.get("/", validateAdmin, bodyContentBlocker, getAllCustomers);
 
 // GET route for customer profile
-router.get("/profile", bodyContentBlocker, getCustomerByIdController);
+customerRouter.get("/profile", bodyContentBlocker, findCustomerProfile);
 
 // PUT route for updating customer info
-router.put(
+customerRouter.put(
   "/",
+
   preventGuest,
   preventAdmin,
   validateCustomer,
-  updateCustomerController
+  updateCustomer
 );
 
 // DELETE route for deleting customer
-router.delete(
+customerRouter.delete(
   "/",
+
   preventGuest,
   preventAdmin,
   bodyContentBlocker,
-  deleteCustomerController
+  deleteCustomer
 );
 
-export default router;
+export default customerRouter;

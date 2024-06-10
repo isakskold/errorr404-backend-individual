@@ -4,6 +4,7 @@ import {
   findCustomerByPhoneNumber,
 } from "../services/customers.js";
 import { findLoggedInCustomer } from "../utils/findLoggedCustomer.js";
+import CustomError from "../utils/customError.js";
 
 //Validation for creating or updating a costumer
 
@@ -30,21 +31,21 @@ export async function validateCustomer(req, res, next) {
 
   // Check if email is already in use
   const existingEmail = await findCustomerByEmail(customer.email);
-  if (existingEmail && existingEmail._id.toString() !== customerId) {
-    return res.status(400).json({ message: "Email already in use" });
-  }
-
   // Check if phone number is already in use
   const existingPhoneNumber = await findCustomerByPhoneNumber(
     customer.phoneNumber
   );
-  if (
+
+  if (existingEmail && existingEmail._id.toString() !== customerId) {
+    // Email is already in use
+    return res.status(400).json({ message: "Email already in use" });
+  } else if (
     existingPhoneNumber &&
     existingPhoneNumber._id.toString() !== customerId
   ) {
+    // Phone number is already in use
     return res.status(400).json({ message: "Phone number already in use" });
   }
-
   // If validation passes and no duplicates found, proceed to the next middleware or route handler
   next();
 }

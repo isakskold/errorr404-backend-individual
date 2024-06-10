@@ -1,4 +1,5 @@
 import nedb from "nedb-promises";
+import CustomError from "../utils/customError.js";
 
 const orderHistoryDb = new nedb({
   filename: "orderHistory.db",
@@ -32,39 +33,8 @@ async function createOrUpdateOrderHistory(orderHistoryData) {
       });
     }
   } catch (error) {
-    throw new Error("Failed to create or update order history");
+    throw new CustomError("Failed to create or update order history", 500);
   }
 }
 
-// Function to get all order histories
-async function getAllOrderHistories() {
-  try {
-    const orderHistories = await orderHistoryDb.find({});
-    if (orderHistories.length === 0) {
-      throw new Error("No order histories found");
-    }
-    return orderHistories;
-  } catch (error) {
-    throw new Error("Failed to fetch order histories");
-  }
-}
-
-// Function to get order history by NeDB _id
-async function getOrderHistoryById(id) {
-  try {
-    const orderHistory = await orderHistoryDb.findOne({ userId: id });
-    if (!orderHistory) {
-      throw new Error("Order history not found");
-    }
-    return orderHistory;
-  } catch (error) {
-    throw new Error("Failed to fetch order history");
-  }
-}
-
-export {
-  createOrUpdateOrderHistory,
-  getAllOrderHistories,
-  getOrderHistoryById,
-  orderHistoryDb,
-};
+export { createOrUpdateOrderHistory, orderHistoryDb };
