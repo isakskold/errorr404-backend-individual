@@ -109,8 +109,4 @@ const getOrderById = async (userId, orderId) => {
   }
 };
 
-const calculateTotalPrice = (cart) => {
-  return cart.reduce((total, item) => total + item.price * item.quantity, 0);
-};
-
 export { createOrder, getOrderById };
