@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 
+import { campaignDatabase } from "./src/services/campaignOffers.js"; //Import initializes database
 import { initializeDatabase } from "./src/services/product.js"; //product database
 import { initializeCustomerDatabase } from "./src/services/customers.js";
 import CustomError from "./src/utils/customError.js";
@@ -14,12 +15,15 @@ import ordersRouter from "./src/routes/orders.js";
 import orderHistoryRouter from "./src/routes/orderHistory.js";
 import customerRouter from "./src/routes/customers.js";
 import productRouter from "./src/routes/products.js";
+import campaignRouter from "./src/routes/campaignOffers.js";
 
 import {
   logCartParam,
   logOrderHistory,
   logOrdersParam,
 } from "./src/middleware/routeConsoleLogs.js";
+
+import { validateAdmin } from "./src/middleware/adminValidation.js";
 
 const app = express();
 
@@ -36,6 +40,7 @@ app.use("/products", productRouter);
 app.use("/cart", logCartParam, cartRouter);
 app.use("/orders", logOrdersParam, ordersRouter);
 app.use("/order-history", logOrderHistory, orderHistoryRouter);
+app.use("/campaign-offers", validateAdmin, campaignRouter);
 
 //Default error for invalid routes
 app.all("*", (req, res, next) => {
