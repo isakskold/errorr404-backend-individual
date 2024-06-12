@@ -1,8 +1,8 @@
 import { calculateTotalPrice, getCart } from "../services/cart.js";
 import { findLoggedInCustomer } from "../utils/findLoggedCustomer.js";
-import { getProductById } from "../controllers/productsController.js";
 import CustomError from "../utils/customError.js";
 import { asyncErrorHandler } from "../utils/asyncErrorHandler.js";
+import { findProductById } from "../services/product.js";
 
 export const customerCart = asyncErrorHandler(async (req, res, next) => {
   const loggedInCustomer = await findLoggedInCustomer();
@@ -11,11 +11,11 @@ export const customerCart = asyncErrorHandler(async (req, res, next) => {
 
   if (cart.length === 0) {
     return res.json({
-      message: "Din varukorg är tom",
+      message: "Your cart is empty",
     });
   }
 
-  const totalPrice = calculateTotalPrice(cart);
+  const totalPrice = await calculateTotalPrice(cart);
   console.log(totalPrice);
 
   return res.status(200).json({
@@ -34,14 +34,14 @@ export const addToCart = asyncErrorHandler(async (req, res, next) => {
   const customerId = loggedInCustomer._id;
   const productId = req.params.productId;
 
-  const foundItem = await getProductById(productId);
+  const foundItem = await findProductById(productId);
   if (!foundItem) {
     throw new CustomError("Product not found", 404);
   }
 
   const cart = getCart(customerId);
   cart.push(foundItem);
-  const totalPrice = calculateTotalPrice(cart);
+  const totalPrice = await calculateTotalPrice(cart);
 
   return res.status(200).json({
     status: "sucess",
@@ -67,11 +67,11 @@ export const deleteFromCart = asyncErrorHandler(async (req, res, next) => {
 
   cart.splice(foundItemIndex, 1);
 
-  const totalPrice = calculateTotalPrice(cart);
+  const totalPrice = await calculateTotalPrice(cart);
 
   return res.status(200).json({
     status: "success",
-    message: "Produkt borttagen från varukorgen",
+    message: "The product has been deleted from cart",
     data: {
       cart,
       totalPrice,

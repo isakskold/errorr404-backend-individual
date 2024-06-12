@@ -1,7 +1,7 @@
 import { getFormattedDateTime } from "../utils/date.js";
 import { asyncErrorHandler } from "../utils/asyncErrorHandler.js";
 import CustomError from "../utils/customError.js";
-import { database } from "../services/product.js";
+import { database, findProductById } from "../services/product.js";
 
 // Add new menu item
 export const createProduct = asyncErrorHandler(async (req, res, next) => {
@@ -29,7 +29,7 @@ export const getAllProducts = asyncErrorHandler(async (req, res, next) => {
 // Get specific menu item
 export const getProductById = asyncErrorHandler(async (req, res, next) => {
   const id = req.params.id;
-  const product = await database.findOne({ _id: id });
+  const product = await findProductById(id);
 
   if (!product) {
     throw new CustomError("Product not found", 404);

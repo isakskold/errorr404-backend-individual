@@ -55,4 +55,8 @@ async function initializeDatabase() {
   }
 }
 
-export { initializeDatabase, database };
+const findProductById = async (id) => {
+  return await database.findOne({ _id: id });
+};
+
+export { initializeDatabase, database, findProductById };

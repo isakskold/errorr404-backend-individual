@@ -1,21 +1,22 @@
 import { Router } from "express";
 import { validateCampaign } from "../middleware/campaignValidation.js";
+import { addCampaignOffer } from "../controllers/campaignOfferController.js";
 
 const campaignRouter = Router();
 
 //GET all
-campaignRouter.get("/");
+//campaignRouter.get("/");
 
 //GET specific
-campaignRouter.get("/:campaignId");
+//campaignRouter.get("/:campaignId");
 
 //POST new
-campaignRouter.post("/", validateCampaign);
+campaignRouter.post("/", validateCampaign, addCampaignOffer);
 
 //PUT existing
-campaignRouter.put("/:campaignId");
+//campaignRouter.put("/:campaignId");
 
 //DELETE existing
-campaignRouter.delete("/:campaignId");
+//campaignRouter.delete("/:campaignId");
 
 export default campaignRouter;
