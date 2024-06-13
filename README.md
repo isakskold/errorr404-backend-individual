@@ -172,3 +172,13 @@ Login as admin to access admin protected routes.
   *http://localhost:3000/campaign-offers*  
 
   Simply make a DELETE request to the URL above to delete the active campaign. Since there can only be one campaign active, you don't need to specify any parameters.
+
+
+
+## ABOUT
+
+- **VIEW ABOUT (GET)**  
+  *http://localhost:3000/about*
+
+  Make a GET request to view about data showing information about the fictional company.
+
