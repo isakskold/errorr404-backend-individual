@@ -1,6 +1,6 @@
 import { createOrUpdateOrderHistory } from "./orderHistory.js";
-import { getCustomerById } from "./customers.js"; // Ensure this is correctly imported
 import { orderHistoryDb } from "./orderHistory.js";
+import { findLoggedInCustomer } from "../utils/findLoggedCustomer.js";
 
 const createOrder = async (userId, cart, totalPrice) => {
   try {
@@ -11,7 +11,7 @@ const createOrder = async (userId, cart, totalPrice) => {
       };
     }
 
-    const customer = await getCustomerById(userId); // Check if the user exists
+    const customer = await findLoggedInCustomer(); // Check if the user exists
 
     const prelTime = new Date();
     const prelDelTime = new Date(prelTime.getTime() + 20 * 60000); // 20 minutes from placed order
@@ -88,8 +88,6 @@ const getOrderById = async (userId, orderId) => {
   };
 
   try {
-    await getCustomerById(userId); // Ensure user exists
-
     // Fetch the order from the order history database
     const order = await fetchOrderByIdFromDatabase(userId, orderId);
 
@@ -109,10 +107,6 @@ const getOrderById = async (userId, orderId) => {
       response: { error: "Failed to fetch order: " + error.message },
     };
   }
-};
-
-const calculateTotalPrice = (cart) => {
-  return cart.reduce((total, item) => total + item.price * item.quantity, 0);
 };
 
 export { createOrder, getOrderById };

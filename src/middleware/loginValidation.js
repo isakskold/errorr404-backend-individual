@@ -1,6 +1,6 @@
 import loginSchema from "../models/loginSchema.js";
 
-export function validateLoginCredentials(req, res, next) {
+export async function validateLoginCredentials(req, res, next) {
   const { error } = loginSchema.validate(req.body, { abortEarly: false });
 
   if (error) {
