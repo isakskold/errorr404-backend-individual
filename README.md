@@ -1,92 +1,174 @@
 # API Documentation
 
-When starting the server with no db files, the products database will autofill. The database for customers will insert a guest user thats logged in by default.
+To get started using this application, clone the repo and install dependencies.
 
-The guest user is limited to some operations to limit potential bugs. The Guest cannot log itself out, update or delete itself.
+Login as admin to access admin protected routes.  
+**Email:** `admin@admin.com`  
+**Password:** `admin1`
 
-You can create a new customer and login on that account to access more API requests.
+## Customer
 
+- **CREATE CUSTOMER (POST)**  
+  *http://localhost:3000/customers*
 
-## CUSTOMERS
+  To create a customer, make a POST request to the URL above. You can copy and paste the JSON below into the request body.
+  
+  ````json
+  {
+      "firstName": "Ex",
+      "lastName": "Ample",
+      "email": "example@mail.test",
+      "password": "password",
+      "phoneNumber": "123456789"
+  }
 
-**POST** new customer http://localhost:3000/customers
+- **VIEW CUSTOMER PROFILE (GET)**  
+  *http://localhost:3000/customers/profile*  
 
-You can copy and paste the json below to create a new customer. Change whatever you like and see what works and what doesn't.
+  Make a GET request to the URL above. The application will dynamically display profile data depending on what customer is logged in. By default, a guest account is logged in.
 
-```json
-{
-	"firstName": "Test",
-	"lastName": "Tester",
-	"email": "testman@testmail.com",
-	"password": "thisisatest",
-	"phoneNumber": "101010010011"
-}
-```
+- **UPDATE CUSTOMER (PUT)**  
+  *http://localhost:3000/customers*
 
-**GET** Profile page for logged in customer. http://localhost:3000/customers/profile  
+  Update customer information by making a PUT request to the URL above. The application will update the customer that is logged in. Enter JSON in the request body below to update a customer.
+  
+  ````json
+  {
+      "firstName": "Updated",
+      "lastName": "Example",
+      "email": "updexa@email.se",
+      "password": "wordpass",
+      "phoneNumber": "987654321"
+  }
 
-**PUT** Update logged in customer information. Guests can't update the guest account. http://localhost:3000/customers
+- **DELETE CUSTOMER (DELETE)**  
+  *http://localhost:3000/customers*  
 
-Copy paste this json into the request body to update user
+  To delete a customer, simply make a DELETE request to the URL above. The application will delete the logged-in customer.
 
-```json
-{
-	"firstName": "TestUpdated",
-	"lastName": "TesterUpdated",
-	"email": "testmanUpdated@testmail.com",
-	"password": "thisisatest",
-	"phoneNumber": "000111000"
-}
-```
+- **VIEW ALL CUSTOMERS (GET)**  
+  *http://localhost:3000/customers*
 
-**DELETE** Delete logged in customer. Guests can't delete the guest account http://localhost:3000/customers
+  To view all customers and customer data, you need to log in as admin. As an admin, make a GET request to the URL above.
 
-## LOGIN
+## Login / Logout
 
-**POST** login user http://localhost:3000/login
+- **LOGIN CUSTOMER (POST)**  
+  *http://localhost:3000/login*
 
-Send valid json data in the request body. A user logs in by entering valid email and phone number values. Below is the test users email and password in json.
+  Make a POST request to the URL above, entering email and password in the request body. Below are the valid login credentials for the admin account.
+  
+  ````json
+  {
+      "email": "admin@admin.com",
+      "password": "admin1"
+  }
 
-```json
-{
-	"email": "testman@testmail.com",
-	"password": "thisisatest"
-}
-```
+- **LOGOUT CUSTOMER (POST)**  
+  *http://localhost:3000/logout*  
 
-## LOGOUT
+  Simply make a POST request to the URL above to log out the logged-in customer.
 
-**POST** logout user http://localhost:3000/logout
+## Products
 
-## PRODUCTS
+- **SEE ALL PRODUCTS (GET)**  
+  *http://localhost:3000/products*  
 
-**GET** all products http://localhost:3000/products
+  Make a GET request to this URL to view all products. The response will also include a message telling you if there are any active campaigns.
 
-## CART
+- **SEE SPECIFIC PRODUCT (GET)**  
+  *http://localhost:3000/products/:productid*  
 
-**GET** cart http://localhost:3000/cart
+  Make a GET request to the URL above using the product `_id` as a route parameter.
 
-**POST** Add product to logged in customer cart using product _id as route parameter http://localhost:3000/cart/:productId
+- **CREATE PRODUCT (POST)**  
+  *http://localhost:3000/products*  
 
-**DELETE** product from customer cart using product _id as route parameter http://localhost:3000/cart/:productID
+  As admin, create a new product by making a POST request to the URL above. Provide JSON in the request body to create the product object, example below.
+  
+  ````json
+  {
+      "title": "EXAMPLE PRODUCT",
+      "desc": "Example description for example product",
+      "price": 49
+  }
 
-## ORDER
+- **UPDATE PRODUCT (PUT)**  
+  *http://localhost:3000/products/:productId*  
 
-**POST** new order. This will empty the customer cart and send the cart items into the customers unique order history object in the orderHistory.db http://localhost:3000/orders
+  As admin, to update an existing product, make a PUT request to the URL above. Use product `_id` as route parameter. Enter updated values in the request body. Example below.
+  
+  ````json
+  {
+      "title": "EXAMPLE PRODUCT UPDATED",
+      "desc": "Example description for example product that has been updated",
+      "price": 59
+  }
 
-**GET** specific order to see delivery time and other info. http://localhost:3000/orders/:orderId
-Use the order ID provided in the response from the POST operation.
+- **DELETE PRODUCT (DELETE)**  
+  *http://localhost:3000/products/:productId*  
 
+  As admin, make a DELETE request to the URL above specifying the product `_id` as route parameter.
 
-## ORDER HISTORY 
+## Cart
 
-**GET** specific customer order history http://localhost:3000/order-history
+- **VIEW CART (GET)**  
+  *http://localhost:3000/cart*
 
+  Make a GET request to view the cart. The cart is not stored in a database, restarting the server will clear the cart.
 
-## ABOUT
+- **ADD TO CART (POST)**  
+  *http://localhost:3000/cart/:productid*  
 
-**GET** about information http://localhost:3000/about
+  Add a product to the cart by making a POST request specifying the product `_id` in the route parameter.
 
+- **DELETE FROM CART (DELETE)**  
+  *http://localhost:3000/cart/:productid*  
 
+  Make a DELETE request specifying the product `_id` in the route parameter to delete that product from the cart.
 
+## Orders and Order History
 
+- **PLACE ORDER (POST)**  
+  *http://localhost:3000/orders*  
+
+  Make a POST request to the URL to place an order if you have products in your cart.
+
+- **SEE SPECIFIC ORDER (GET)**  
+  *http://localhost:3000/orders/:orderId*  
+
+  To view an order and see data like price, order, and delivery time, make a GET request to the URL above specifying the `orderId` as the route parameter. The `orderId` will be provided in the response when placing an order.
+
+- **VIEW CUSTOMER ORDER HISTORY (GET)**  
+  *http://localhost:3000/order-history*  
+
+  Make a GET request to the URL above to view the logged-in customer's entire order history.
+
+- **VIEW ALL ORDER HISTORIES (GET)**  
+  *http://localhost:3000/order-history/all*  
+
+  Admin protected route. Log in as admin and make a GET request to the URL above to view order histories for every customer.
+
+## Campaign Offers
+
+- **CREATE CAMPAIGN OFFER (POST)**  
+  *http://localhost:3000/campaign-offers*
+
+  As admin, make a POST request to the URL above to create a new campaign offer. Enter an array that stores products. Include as many products as you want, and specify how many of that product a customer has to place in the cart. If a customer has every product listed in the campaign offer in their cart, and the correct minimum quantity for each of those products, the campaign offer will be applied. To include a product in the campaign, use the product `_id` for the `productId` property. Choose a quantity for each product. You will also be prompted to add a description. This description will show when a customer visits the products page. There can only be one active campaign.
+
+  Lastly, enter the discount value. Use this JSON below to create a new campaign.
+
+  ````json
+  {
+      "campaignProducts": [
+          { "productId": "BvrHYlR2qm8xY0Jx", "quantity": 2},
+          { "productId": "Dr1yVEEC6hwAKfwk", "quantity": 2 }
+      ],
+      "description": "Description for campaign offer",
+      "discount": 100
+  }
+
+- **DELETE CAMPAIGN OFFER (DELETE)**  
+  *http://localhost:3000/campaign-offers*  
+
+  Simply make a DELETE request to the URL above to delete the active campaign. Since there can only be one campaign active, you don't need to specify any parameters.
