@@ -1,7 +1,8 @@
 import { getFormattedDateTime } from "../utils/date.js";
 import { asyncErrorHandler } from "../utils/asyncErrorHandler.js";
 import CustomError from "../utils/customError.js";
-import { database } from "../services/product.js";
+import { database, findProductById } from "../services/product.js";
+import { campaignDatabase } from "../services/campaignOffers.js";
 
 // Add new menu item
 export const createProduct = asyncErrorHandler(async (req, res, next) => {
@@ -19,9 +20,20 @@ export const createProduct = asyncErrorHandler(async (req, res, next) => {
 // Get all menu items
 export const getAllProducts = asyncErrorHandler(async (req, res, next) => {
   const products = await database.find({});
+  const activeCampaign = await campaignDatabase.find({});
+  // Assuming there is only one campaign
+  const campaignMessage =
+    activeCampaign.length > 0
+      ? activeCampaign[0].description
+      : "No active campaign";
+
+  console.log("Active campaign: ", activeCampaign);
+  console.log("Campaign message: ", campaignMessage);
+
   return res.status(200).json({
     status: "Success",
     message: "All products found",
+    campaignOffer: campaignMessage,
     data: products,
   });
 });
@@ -29,7 +41,7 @@ export const getAllProducts = asyncErrorHandler(async (req, res, next) => {
 // Get specific menu item
 export const getProductById = asyncErrorHandler(async (req, res, next) => {
   const id = req.params.id;
-  const product = await database.findOne({ _id: id });
+  const product = await findProductById(id);
 
   if (!product) {
     throw new CustomError("Product not found", 404);

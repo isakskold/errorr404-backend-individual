@@ -1,8 +1,16 @@
 export default (error, req, res, next) => {
-  error.statusCode = error.statusCode || 500;
-  error.status = error.status || "error";
-  res.status(error.statusCode).json({
-    status: error.statusCode,
-    message: error.message,
-  });
+  if (error.isOperational) {
+    // Operational error, handle gracefully
+    res.status(error.statusCode || 500).json({
+      status: "fail",
+      message: error.message,
+    });
+  } else {
+    // Programming error, log and respond with generic message
+    console.error("PROGRAMMING ERROR:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Something went wrong",
+    });
+  }
 };

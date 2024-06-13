@@ -47,9 +47,7 @@ async function initializeDatabase() {
   try {
     const count = await database.count({});
     if (count === 0) {
-      for (const product of defaultProducts) {
-        await createProduct(product);
-      }
+      await database.insert(defaultProducts);
       console.log("Default products inserted.");
     }
   } catch (error) {
@@ -57,4 +55,8 @@ async function initializeDatabase() {
   }
 }
 
-export { initializeDatabase, database };
+const findProductById = async (id) => {
+  return await database.findOne({ _id: id });
+};
+
+export { initializeDatabase, database, findProductById };
