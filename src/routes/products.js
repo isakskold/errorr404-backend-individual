@@ -9,6 +9,7 @@ import {
 import { validateProduct } from "../middleware/productValidation.js";
 import { bodyContentBlocker } from "../middleware/bodyContentBlocker.js";
 import { validateAdmin } from "../middleware/adminValidation.js";
+import { isProductInCampaign } from "../middleware/isProductInCampaign.js";
 
 const productRouter = Router();
 
@@ -24,9 +25,21 @@ productRouter.post("/", validateAdmin, validateProduct, createProduct);
 productRouter.get("/:id", bodyContentBlocker, getProductById);
 
 // UPDATE menu item by _id
-productRouter.put("/:id", validateAdmin, validateProduct, updateProduct);
+productRouter.put(
+  "/:id",
+  validateAdmin,
+  isProductInCampaign,
+  validateProduct,
+  updateProduct
+);
 
 // DELETE menu item by _id
-productRouter.delete("/:id", validateAdmin, bodyContentBlocker, deleteProduct);
+productRouter.delete(
+  "/:id",
+  validateAdmin,
+  bodyContentBlocker,
+  isProductInCampaign,
+  deleteProduct
+);
 
 export default productRouter;

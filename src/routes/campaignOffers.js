@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { validateCampaign } from "../middleware/campaignValidation.js";
-import { addCampaignOffer } from "../controllers/campaignOfferController.js";
+import {
+  addCampaignOffer,
+  deleteCampaignOffer,
+} from "../controllers/campaignOfferController.js";
 
 const campaignRouter = Router();
 
@@ -16,7 +19,7 @@ campaignRouter.post("/", validateCampaign, addCampaignOffer);
 //PUT existing
 //campaignRouter.put("/:campaignId");
 
-//DELETE existing
-//campaignRouter.delete("/:campaignId");
+//DELETE existing campaign
+campaignRouter.delete("/", deleteCampaignOffer);
 
 export default campaignRouter;

@@ -20,6 +20,11 @@ const campaignSchema = Joi.object({
     .messages({
       "any.required": "At least one product is required in the campaign",
     }),
+
+  description: Joi.string().min(20).required().messages({
+    "any.required": "Description must be atleast 20 string characters.",
+  }),
+
   discount: Joi.number().required().messages({
     "number.base": '"discount" must be a number',
     "any.required": '"discount" is required',

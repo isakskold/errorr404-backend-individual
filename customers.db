@@ -1,2 +1,3 @@
-{"firstName":"Guest","loggedIn":true,"_id":"guestintest"}
-{"firstName":"admin","email":"admin@admin.com","password":"admin1","loggedIn":false,"_id":"admin"}
+{"firstName":"Isak","lastName":"Sköld","email":"isakskold@hotmail.com","password":"password","phoneNumber":"123456789","loggedIn":false,"_id":"4ckdiZUSnM3Dzz7P"}
+{"firstName":"admin","email":"admin@admin.com","password":"admin1","loggedIn":true,"_id":"admin"}
+{"firstName":"Guest","loggedIn":false,"_id":"guestintest"}

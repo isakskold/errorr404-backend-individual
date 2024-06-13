@@ -5,7 +5,16 @@ import { database as productDatabase } from "../services/product.js";
 
 // Controller to add a new campaign offer
 export const addCampaignOffer = asyncErrorHandler(async (req, res, next) => {
-  const { campaignProducts, discount } = req.body;
+  // Check if campaignDatabase is not empty
+  const existingCampaigns = await campaignDatabase.find({});
+  if (existingCampaigns.length > 0) {
+    throw new CustomError(
+      "Campaign offer already exists, cannot add another",
+      403
+    );
+  }
+
+  const { campaignProducts, description, discount } = req.body;
 
   // Check if all product IDs in the request body exist in the product database
   const productIds = campaignProducts.map((product) => product.productId);
@@ -39,6 +48,7 @@ export const addCampaignOffer = asyncErrorHandler(async (req, res, next) => {
       title: foundProducts.find((p) => p._id === product.productId).title,
       price: foundProducts.find((p) => p._id === product.productId).price,
     })),
+    description,
     discount,
   };
 
@@ -48,5 +58,22 @@ export const addCampaignOffer = asyncErrorHandler(async (req, res, next) => {
     status: "success",
     message: "Campaign offer created successfully",
     campaignOffer: newCampaignOffer,
+  });
+});
+
+export const deleteCampaignOffer = asyncErrorHandler(async (req, res, next) => {
+  // Check if campaignDatabase is empty
+  let existingCampaigns = await campaignDatabase.find({});
+  if (existingCampaigns.length === 0) {
+    throw new CustomError("No campaign to delete", 404);
+  }
+
+  await campaignDatabase.remove({});
+  existingCampaigns = await campaignDatabase.find({});
+
+  return res.status(200).json({
+    status: "Success",
+    message: "Campaign offer deleted successfully.",
+    data: existingCampaigns,
   });
 });

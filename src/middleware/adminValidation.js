@@ -6,7 +6,7 @@ export const validateAdmin = asyncErrorHandler(async (req, res, next) => {
   const loggedInCustomer = await findLoggedInCustomer();
 
   if (loggedInCustomer._id !== "admin") {
-    throw new CustomError("Admin authorization denied", 400);
+    throw new CustomError("Admin authorization denied", 403);
   }
   next();
 });

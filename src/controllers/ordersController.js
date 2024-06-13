@@ -13,7 +13,7 @@ export const createOrder = asyncErrorHandler(async (req, res, next) => {
   const totalPrice = await calculateTotalPrice(cart);
 
   if (cart.length === 0) {
-    throw new CustomError("Cart is empty", 400);
+    throw new CustomError("Cart is empty", 404);
   }
 
   const customer = loggedInCustomer;
@@ -46,10 +46,12 @@ export const createOrder = asyncErrorHandler(async (req, res, next) => {
     deliveryTime: deliveryTime,
   };
 
+  const totalPriceAfterDiscount = totalPrice.totalPrice;
+
   const orderHistoryData = {
     userId,
     firstName: customer.firstName,
-    totalPrice: totalPrice,
+    totalPrice: totalPriceAfterDiscount,
     orders: [newOrder],
   };
 

@@ -4,6 +4,15 @@ import CustomError from "../utils/customError.js";
 import { asyncErrorHandler } from "../utils/asyncErrorHandler.js";
 import { findProductById } from "../services/product.js";
 
+// Helper function to create the data object
+const createResponseData = (status, message, totalPrice, discount, cart) => ({
+  status,
+  message,
+  totalPrice,
+  discount,
+  data: { cart },
+});
+
 export const customerCart = asyncErrorHandler(async (req, res, next) => {
   const loggedInCustomer = await findLoggedInCustomer();
   const customerId = loggedInCustomer._id;
@@ -15,18 +24,20 @@ export const customerCart = asyncErrorHandler(async (req, res, next) => {
     });
   }
 
-  const totalPrice = await calculateTotalPrice(cart);
-  console.log(totalPrice);
+  const { totalPrice, discount } = await calculateTotalPrice(cart);
 
-  return res.status(200).json({
-    status: "success",
-    message: "Customer cart",
-    totalPrice: totalPrice,
-    data: {
-      cart,
-    },
-  });
-  next();
+  console.log("Total Price: ", totalPrice);
+  console.log("Discount: ", discount);
+
+  const data = createResponseData(
+    "success",
+    "Customer cart",
+    totalPrice,
+    discount,
+    cart
+  );
+
+  return res.status(200).json(data);
 });
 
 export const addToCart = asyncErrorHandler(async (req, res, next) => {
@@ -41,17 +52,17 @@ export const addToCart = asyncErrorHandler(async (req, res, next) => {
 
   const cart = getCart(customerId);
   cart.push(foundItem);
-  const totalPrice = await calculateTotalPrice(cart);
+  const { totalPrice, discount } = await calculateTotalPrice(cart);
 
-  return res.status(200).json({
-    status: "sucess",
-    message: "Product added to cart",
-    data: {
-      totalPrice: totalPrice,
-      cart,
-    },
-  });
-  next();
+  const data = createResponseData(
+    "success",
+    "Product added to cart",
+    totalPrice,
+    discount,
+    cart
+  );
+
+  return res.status(200).json(data);
 });
 
 export const deleteFromCart = asyncErrorHandler(async (req, res, next) => {
@@ -67,15 +78,15 @@ export const deleteFromCart = asyncErrorHandler(async (req, res, next) => {
 
   cart.splice(foundItemIndex, 1);
 
-  const totalPrice = await calculateTotalPrice(cart);
+  const { totalPrice, discount } = await calculateTotalPrice(cart);
 
-  return res.status(200).json({
-    status: "success",
-    message: "The product has been deleted from cart",
-    data: {
-      cart,
-      totalPrice,
-    },
-  });
-  next();
+  const data = createResponseData(
+    "success",
+    "Product removed from cart",
+    totalPrice,
+    discount,
+    cart
+  );
+
+  return res.status(200).json(data);
 });

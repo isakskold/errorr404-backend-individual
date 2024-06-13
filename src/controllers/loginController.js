@@ -12,7 +12,7 @@ export const loginController = asyncErrorHandler(async (req, res) => {
   const customer = await findCustomerByEmail(email);
 
   if (!customer) {
-    throw new CustomError("Invalid email", 404);
+    throw new CustomError("Invalid email", 401);
   }
 
   // Check if the password matches
@@ -22,7 +22,7 @@ export const loginController = asyncErrorHandler(async (req, res) => {
     if (loggedInCustomer && loggedInCustomer.email === customer.email) {
       throw new CustomError(
         `${loggedInCustomer.email} is already logged in.`,
-        400
+        401
       );
     }
 
@@ -37,6 +37,6 @@ export const loginController = asyncErrorHandler(async (req, res) => {
       message: `Customer logged in, welcome ${customer.firstName}`,
     });
   } else {
-    throw new CustomError("Invalid password", 404);
+    throw new CustomError("Invalid password", 401);
   }
 });

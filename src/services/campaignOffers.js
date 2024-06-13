@@ -40,17 +40,20 @@ export const applyCampaignOffers = async (cart, totalPrice) => {
       }
     );
 
+    let discount = 0;
+
     // Apply discount if all products are in the cart with required quantities
     if (allProductsInCart) {
-      console.log(`Applying discount of ${campaign.discount}`);
-      totalPrice -= campaign.discount;
+      discount = campaign.discount;
+      console.log(`Applying discount of ${discount}`);
+      totalPrice -= discount;
     }
 
     // Ensure total price is not negative
     if (totalPrice < 0) {
       totalPrice = 0;
     }
-    return totalPrice;
+    return { totalPrice, discount };
   } catch (error) {
     if (error instanceof CustomError) {
       throw error;
